@@ -18,8 +18,14 @@ public record Student(String id, String name, int age, BigDecimal gpa ){
         if(gpa.signum() <0 || gpa.compareTo(MAX_GPA) > 0)
             throw new IllegalArgumentException("GPA must be between 0.0 and 4.0");
 
-//        if(gpa.)
 
     }
+        // convenience factory: GPA as text keeps it exact ("3,8", never 3.8)
+        public static Student of(String id, String name, int age, String gpa){
+            return new  Student(id, name, age, new BigDecimal(gpa));
+        }
+        public boolean gpaAtLeast(String threshold){
+        return gpa.compareTo(new BigDecimal(threshold)) >=0;
+        }
 
 }
