@@ -34,10 +34,19 @@ void main() {
     IO.println("Course: %s (Capacity %d)".formatted(course.getTitle(),course.getCapacity() ));
 
     IO.println(course.getCapacity());
-//    IO.println(course.setTitle("ad"));
+
+    var abebe = Student.of("S1", "Abebe",20,"3.8");
+    IO.println("Student Id %s, name %s Age %d GPA %s".formatted(abebe.id(), abebe.name(), abebe.age(), abebe.gpa() ) );
+
+    // Student.of("S2", "", 20, "3.0");
+    var abebe2 = Student.of("S3", "Test", 22, "3.0");
+    IO.println("Student Id %s, name %s Age %d GPA %s".formatted(abebe2.id(), abebe2.name(), abebe2.age(), abebe2.gpa() ) );
+
+// Student.of("S3", "Test", 12, "3.0");
+// Student.of("S4", "Test", 20, "5.0");
 
 
-  }
+}
 
 
 
