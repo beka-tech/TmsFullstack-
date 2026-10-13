@@ -1,3 +1,6 @@
-Student.class
+Gradable.class
+Quiz.class
 Course.class
+LabAssignment.class
+Student.class
 EnrollmentRecord.class
