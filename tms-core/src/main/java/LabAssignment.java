@@ -12,6 +12,7 @@ implements Gradable {
         // 70% functionality 30% code quality
         // Final Score = (Functionality Score × Functionality Weight)
 //             + (Code Quality Score × Quality Weight)
+        // return calculateGrade values
         return functionalityScore.multiply(FUNCTIONALITY_WEIGHT)
                 .add(codeQualityScore.multiply(QUALITY_WEIGHT));
     }

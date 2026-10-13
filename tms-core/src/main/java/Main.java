@@ -44,8 +44,20 @@ void main() {
 
 // Student.of("S3", "Test", 12, "3.0");
 // Student.of("S4", "Test", 20, "5.0");
+List <Gradable > cohortAssessments = List.of(
+        new Quiz("Java Basics", 18,20),
+        new LabAssignment("Registration API",new BigDecimal("90"),new BigDecimal("85")));
+
+printGradeReport(cohortAssessments);
 
 
+}
+
+void printGradeReport(List<? extends Gradable> assessments){
+    IO.println("---Grade Report ---");
+    for (Gradable item : assessments){
+        IO.println("%s: %.2f%%" .formatted(item.title(), item.calculateGrade()));
+    }
 }
 
 
