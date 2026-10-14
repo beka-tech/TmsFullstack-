@@ -4,3 +4,4 @@ Course.class
 LabAssignment.class
 Student.class
 EnrollmentRecord.class
+EnrollmentService.class
