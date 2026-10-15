@@ -1,6 +1,12 @@
 import java.math.BigDecimal;
 import java.time.Instant;
 
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+
 void main() {
 
     var enrollment = new EnrollmentRecord("STU-001", "CS-401",Instant.now());
@@ -72,6 +78,68 @@ printGradeReport(cohortAssessments);
         IO.println("Business rule: " + ex.getMessage());
     }
 
+    List<Student> students = List.of(
+            Student.of("S1", "Abeba", 22, "3.8"),
+            Student.of("S2", "Kidane", 21, "2.4"),
+            Student.of("S3", "Dawit", 20, "3.1"),
+            Student.of("S4", "Sara", 23, "3.9"),
+            Student.of("S5", "Frehiwot", 19, "2.0"),
+            Student.of("S6", "Yonas", 24, "3.5"),
+            Student.of("S7", "Meron", 22, "1.8"),
+            Student.of("S8", "Tesfaye", 21, "2.9"));
+
+    List<Student> leaderboard = students.stream()
+            .filter( student ->student.gpaAtLeast("3.5"))
+            .sorted(Comparator.comparing(Student::gpa).reversed())
+//            .map(student -> Student(student.name())) how to get the name without changing the <Student> to <String>
+//            .map(student -> new Student(student.getName()))
+
+            .toList();
+
+
+    IO.println("Found %d Honors Students:".formatted(leaderboard.size()));
+    for (Student name : leaderboard) {
+        IO.println("- " + name);
+    }
+
+    // TODO 5: Add up all GPAs, then divide by the number of students,
+    // keeping 2 decimal places.
+
+    BigDecimal averageGpa = students.stream()
+            .map(Student::gpa)
+            .reduce(BigDecimal.ZERO, BigDecimal::add)
+            .divide(BigDecimal.valueOf(students.size()), 2, RoundingMode.HALF_UP);
+
+
+    IO.println("\n Class Average GPA:" + averageGpa);
+
+
+    Map<String, List<Student>> standingGroups = students.stream()
+            .collect(Collectors.groupingBy(s -> standing(s),
+                    LinkedHashMap::new, Collectors.toList()));
+
+
+    IO.println("\n ---Academic Standing Report ----");
+    standingGroups.forEach((label, group)->{
+        IO.println("\n%s (%d):".formatted(label, group.size()));
+        group.forEach(s->IO.println("%s GPA: %s". formatted(s.name(), s.gpa())));
+    });
+
+    List<String> backendCourses = List.of("Java", "Spring Boot");
+    List<String> frontendCourses = List.of("TypeScript","Angular");
+    List<String> allCourses = Stream.of(backendCourses, frontendCourses, List.of("Capstone")).flatMap(List::stream).toList();
+
+    IO.println("\nFull curriculum: " + String.join(", ",allCourses));
+
+}
+
+String standing(Student s) {
+    return switch (s) {
+        case Student x when x.gpaAtLeast("3.5") -> "Honors";
+        case Student x when x.gpaAtLeast("2.5") -> "Good Standing";
+        case Student x when x.gpaAtLeast("2.0") -> "Probation";
+        case Student x -> "Academic Warning";
+    };
 }
 
 void printGradeReport(List<? extends Gradable> assessments){
