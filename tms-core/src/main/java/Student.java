@@ -24,6 +24,7 @@ public record Student(String id, String name, int age, BigDecimal gpa ){
         public static Student of(String id, String name, int age, String gpa){
             return new  Student(id, name, age, new BigDecimal(gpa));
         }
+        public String getName() {return name;}
         public boolean gpaAtLeast(String threshold){
         return gpa.compareTo(new BigDecimal(threshold)) >=0;
         }
