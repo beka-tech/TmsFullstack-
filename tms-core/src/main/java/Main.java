@@ -2,12 +2,17 @@ import java.math.BigDecimal;
 import java.time.Instant;
 
 import java.util.List;
-import java.util.ArrayList;
+//import java.util.ArrayList;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static java.util.concurrent.CompletableFuture.*;
+
 
 void main() {
+
+
+
 
     var enrollment = new EnrollmentRecord("STU-001", "CS-401",Instant.now());
 
@@ -131,8 +136,64 @@ printGradeReport(cohortAssessments);
 
     IO.println("\nFull curriculum: " + String.join(", ",allCourses));
 
-}
+    // the wrong way platform threads
+    long start = System.nanoTime();
+    for(int i = 0; i < 5; i++){
+        simulateDbCall(300);
+    }
+    IO.println("Blocking sequential: %d ms " .formatted(elapsedMs(start)));
 
+
+    // STILL STARVED: concurrent, but only 2 platform threads for 5 Database calls
+    start = System.nanoTime();
+    try (ExecutorService pool = Executors.newFixedThreadPool(2)){
+        for(int i=0;i<5;i++){
+            pool.submit(()->simulateDbCall(300));
+        }
+    }
+    IO.println("small thread pool: %d ms" .formatted(elapsedMs(start)) );
+
+
+    // THE RIGHT WAY one Virtual thread per call, all 5 wait at the same time
+
+    start = System.nanoTime();
+    try (ExecutorService vts = Executors.newVirtualThreadPerTaskExecutor() ){
+        for (int i = 0; i < 5; i++){
+            vts.submit(()->simulateDbCall(300));
+        }
+    }
+    IO.println("Virtual threads: %d ms".formatted(elapsedMs(start)));
+
+    long runStart = System.nanoTime();
+    List<String> studentIds = List.of("S1","S2","S3","S4","S5");
+    List<String> courseCodes = List.of("CRS-101","CRS-201","CRS-301");
+
+    List<Student> loadedStudents;
+    List<Course> loadedCourses ;
+
+    try (ExecutorService io = Executors.newVirtualThreadPerTaskExecutor()){
+        // START every fetch (student and Course ) and Keep the future in a list
+        List<CompletableFuture<Student>> studentFutures = studentIds.stream()
+//                .map(id-> supplyAsync(() -> fetchCourse(id),io)
+                .map(id->CompletableFuture.supplyAsync(() -> fetchStudent(id), io))
+                .toList();
+
+
+        List<CompletableFuture<Course>> courseFutures = courseCodes.stream()
+                .map(code -> CompletableFuture.supplyAsync(() -> fetchCourse(code), io))
+                .toList();
+
+                loadedStudents = studentFutures.stream().map(CompletableFuture::join).toList();
+                loadedCourses = courseFutures.stream().map(CompletableFuture::join).toList();
+    }
+
+    IO.println("\nLoaded %d students and %d courses in %d ms"
+            .formatted(loadedStudents.size(), loadedCourses.size(), elapsedMs(runStart)));
+    for (Student s : loadedStudents) {
+        IO.println(" %s GPA: %s".formatted(s.name(), s.gpa()));
+    }
+}
+//----------------------------------------------
 String standing(Student s) {
     return switch (s) {
         case Student x when x.gpaAtLeast("3.5") -> "Honors";
@@ -149,5 +210,44 @@ void printGradeReport(List<? extends Gradable> assessments){
     }
 }
 
+void simulateDbCall(long millis){
+    try {
+        Thread.sleep(millis);
+    }
+    catch (InterruptedException e){
+        Thread.currentThread().interrupt();
+        throw new IllegalStateException("Interrupted while waiting", e);
+    }
+}
+
+long elapsedMs(long startNanos) {
+    return (System.nanoTime() - startNanos) / 1_000_000;
+}
 
 
+Student fetchStudent(String id){
+    IO.println(" Fetching " + id + "...");
+    simulateDbCall(300);
+    String gpa = switch(id){
+        case "S1" ->"3.8";
+        case "S2" ->"2.4";
+        case "S3" ->"3.5";
+        case "S4" ->"1.9";
+        case "S5" ->"3.2";
+        default -> "2.5";
+    };
+    return Student.of(id, "Student" + id, 20,gpa);
+
+}
+
+Course fetchCourse(String code){
+    IO.println(" Fecth course " + code + "....");
+    simulateDbCall(200);
+    int capacity = switch (code){
+        case "CRS-101"->2;
+        case "CRS-201"->30;
+        case "CRS-301"->15;
+        default -> 25;
+    };
+    return new Course(code, "Course- " + code, capacity);
+}
