@@ -12,8 +12,6 @@ import static java.util.concurrent.CompletableFuture.*;
 void main() {
 
 
-
-
     var enrollment = new EnrollmentRecord("STU-001", "CS-401",Instant.now());
 
     var duplicate = new EnrollmentRecord("STU-001", "CS-401",enrollment.enrolledAt());
@@ -190,7 +188,26 @@ printGradeReport(cohortAssessments);
     IO.println("\nLoaded %d students and %d courses in %d ms"
             .formatted(loadedStudents.size(), loadedCourses.size(), elapsedMs(runStart)));
     for (Student s : loadedStudents) {
-        IO.println(" %s GPA: %s".formatted(s.name(), s.gpa()));
+        IO.println(" %s GPA: %s %s" .formatted(s.name(), s.gpa(),Thread.currentThread().getName() ));
+    }
+
+    var enrollCourse = new Course("CRS-101","Java Mastery",2);
+    var enrollService = new EnrollmentService();
+
+    List<EnrollmentRecord> enrollments = new ArrayList<>();
+    List<String> failures = new ArrayList<>();
+
+    for(Student student : loadedStudents){
+        try {
+            EnrollmentRecord enrolled =
+                    enrollService.processRegistration(student,enrollCourse);
+            enrollCourse.setEnrolledCount(enrollCourse.getEnrolledCount() + 1);
+            enrollments.add(enrolled);
+            IO.println("Enrolled: " + student.name());
+        } catch (IllegalStateException ex){
+            failures.add(student.name() + ": " + ex.getMessage());
+            IO.println("Rejected: "+ student.name() + " - "+ex.getMessage());
+        }
     }
 }
 //----------------------------------------------
