@@ -1,6 +1,8 @@
+CapacityReachedException.class
 Gradable.class
 Quiz.class
 Course.class
+TmsDatabaseException.class
 LabAssignment.class
 Student.class
 EnrollmentRecord.class

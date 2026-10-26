@@ -10,7 +10,8 @@ public class EnrollmentService {
         Objects.requireNonNull(course, "course");
 
         if(course.getEnrolledCount() >= course.getCapacity())
-            throw new IllegalStateException("Course '%s' is at Full capacity ".formatted(course.getTitle()));
+//            throw new IllegalStateException("Course '%s' is at Full capacity ".formatted(course.getTitle()));
+            throw new CapacityReachedException(course.getCode());
 
 
         // TODO 2: Classify academic standing with guarded patterns
