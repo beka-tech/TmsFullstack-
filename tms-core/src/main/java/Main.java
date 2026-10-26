@@ -205,10 +205,38 @@ printGradeReport(cohortAssessments);
             enrollments.add(enrolled);
             IO.println("Enrolled: " + student.name());
         } catch (IllegalStateException ex){
+//        } catch (CapacityReachedException ex){
             failures.add(student.name() + ": " + ex.getMessage());
             IO.println("Rejected: "+ student.name() + " - "+ex.getMessage());
         }
     }
+
+//    Thread.startVirtualThread(()->sendConfirmation());
+
+//    Student Name = ;?
+
+
+    // fire and forget
+//    for (Student s : loadedStudents) {
+//        Thread.startVirtualThread(() -> sendConfirmation(s));
+//
+//    }
+
+    try {
+        var overflowCourse = new Course("CRS-999","Overflow Test",1);
+        overflowCourse.setEnrolledCount(1);
+        enrollService.processRegistration(Student.of("S99","Test",20,"3.0"),overflowCourse);
+    }
+    catch (CapacityReachedException ex ) {
+        IO.println("\nDomain exception caught :");
+        IO.println(" Course : "+ ex.getCourseCode());
+        IO.println(" Message: "+ ex.getMessage());
+
+    }
+
+
+
+
 }
 //----------------------------------------------
 String standing(Student s) {
@@ -268,3 +296,13 @@ Course fetchCourse(String code){
     };
     return new Course(code, "Course- " + code, capacity);
 }
+
+//void sendConfirmation(Student student ){
+//try {
+//    simulateDbCall(100);
+//    IO.println("Email sent to " + student.name());
+//}
+//    catch (RuntimeException ex){
+//    IO.println("Email failed for " + student.name()+ " : " + ex.getMessage() );
+//    }
+//}
