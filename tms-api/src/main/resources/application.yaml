@@ -1,3 +1,7 @@
 spring:
   application:
     name: tms-api
+tms:
+  payments:
+   gateway-url: https://pay.example.et/api
+   max-deposit-birr: 5000
