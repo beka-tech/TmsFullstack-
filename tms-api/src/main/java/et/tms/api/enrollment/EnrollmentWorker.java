@@ -17,6 +17,7 @@ public class EnrollmentWorker{
     public int  processBatch (){
         EnrollmentBatch batch = batches.getObject();
        int size = batch.size();
+//       log.info("new EnrollmentBatch #{}",System.identityHashCode(this));
         return size;
     }
 }
