@@ -1,18 +1,22 @@
 package et.tms.api.enrollment;
 import java.time.Instant;
+import java.util.stream.Stream;
+
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
 
 @Component
 public class EnrollmentWorker{
 
-    private final EnrollmentBatch batch;
+    private final ObjectProvider<EnrollmentBatch> batches;
 
-    public EnrollmentWorker(EnrollmentBatch batch){
-        this.batch = batch;
+    public EnrollmentWorker(ObjectProvider<EnrollmentBatch> batches){
+        this.batches = batches;
     }
 
-    public int processBatch (){
-        batch.add("Scholarship-run" + Instant.now());
-        return batch.size();
+    public int  processBatch (){
+        EnrollmentBatch batch = batches.getObject();
+       int size = batch.size();
+        return size;
     }
 }
