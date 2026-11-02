@@ -5,3 +5,7 @@ tms:
   payments:
    gateway-url: https://pay.example.et/api
    max-deposit-birr: 5000
+logging:
+  structured:
+    format:
+      console: ecs #Elastic Common Schema JSON; logstash and gelf also work
