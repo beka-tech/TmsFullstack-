@@ -23,6 +23,11 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/assessments/**").authenticated()
                         .requestMatchers("/api/**").permitAll()
+                        .requestMatchers("/swagger-ui.html").permitAll()
+                        .requestMatchers("/swagger-ui/**").permitAll()
+                        .requestMatchers("/v3/api-docs/**").permitAll()
+//                        .requestMatchers("/api/error").permitAll()
+//                        .requestMatchers("/api/error").authenticated());
                         .anyRequest().denyAll());
         return http.build();
     }
