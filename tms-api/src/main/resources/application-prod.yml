@@ -1,10 +1,10 @@
-springdocs:
-  api-docs:
-    enabled:false
-  swagger-ui:
-    enable:false
-
-  server:
-    error:
-      include-stacktrace:never
-      include-message:never
+#springdocs:
+#  api-docs:
+#    enabled:false
+#  swagger-ui:
+#    enable:false
+#
+#  server:
+#    error:
+#      include-stacktrace:never
+#      include-message:never
