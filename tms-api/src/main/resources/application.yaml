@@ -1,23 +1,32 @@
+# Shared configuration for all environments (dev, prod, etc.).
 spring:
   application:
     name: tms-api
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/tms
-    username: postgres
-    password: ${TMS_DB_PASSWORD}
+    # Local defaults for development. Production overrides URL and username.
+    url: ${TMS_DB_URL:jdbc:postgresql://localhost:5432/tms}
+    username: ${TMS_DB_USERNAME:postgres}
+    password: ${TMS_DB_PASSWORD:beka}
 
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: validate # Flyway manages schema changes; Hibernate validates.
     open-in-view: false
+    show-sql: true      # print every SQL statement
+
+  flyway:
+    enabled: true
 
 tms:
   payments:
-    gateway-url: https://pay.example.et/api
+    # Example endpoint for development; prod requires a real value.
+    gateway-url: ${TMS_PAYMENTS_GATEWAY_URL:https://pay.example.et/api}
     max-deposit-birr: 5000
 
 logging:
-  structured:
-    format:
-      console: ecs
+  level:
+    root: INFO
+    org.hibernate.orm.jdbc.bind: TRACE # print the parameter values (dev only)
+
+
