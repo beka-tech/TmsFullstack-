@@ -1,4 +1,8 @@
 package et.tms.api.report;
 
-public class CourseEnrollmentCount {
+public record CourseEnrollmentCount(
+        String title,
+        Long enrollmentCount
+) {
+
 }
