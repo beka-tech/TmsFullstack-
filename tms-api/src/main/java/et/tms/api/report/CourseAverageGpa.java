@@ -1,4 +1,7 @@
 package et.tms.api.report;
 
-public class CourseAverageGpa {
+public record CourseAverageGpa (
+        String course,
+        Double averageGpa
+) {
 }
