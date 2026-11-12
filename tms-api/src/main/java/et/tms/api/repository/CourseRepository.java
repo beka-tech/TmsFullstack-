@@ -5,7 +5,6 @@ import et.tms.api.report.CourseEnrollmentCount;
 
 import java.util.List;
 
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -24,6 +23,5 @@ public interface CourseRepository
         ORDER BY COUNT(e) DESC, c.title ASC, c.id ASC
         """)
     List<CourseEnrollmentCount> coursesByEnrollmentCount(
-            Pageable pageable
-    );
+            );
 }
