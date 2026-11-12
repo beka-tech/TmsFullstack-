@@ -1,8 +1,6 @@
 package et.tms.api.controller;
 
-import et.tms.api.entity.Student;
 import et.tms.api.report.CourseAverageGpa;
-import et.tms.api.report.CourseEnrollmentCount;
 import et.tms.api.report.CourseEnrollmentCount;
 import et.tms.api.report.StudentSummary;
 import et.tms.api.repository.CourseRepository;
@@ -13,6 +11,7 @@ import et.tms.api.repository.StudentRepository;
 import java.math.BigDecimal;
 import java.util.List;
 
+import et.tms.api.service.RegistrarService;
 import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,13 +27,15 @@ public class RegistrarController {
     private final StudentRepository students;
     private final CourseRepository courses;
     private final EnrollmentRepository enrollments;
+    private final RegistrarService registra;
 
     public RegistrarController(StudentRepository students,
                                CourseRepository courses,
-                               EnrollmentRepository enrollments) {
+                               EnrollmentRepository enrollments, RegistrarService registra) {
         this.students = students;
         this.courses = courses;
         this.enrollments = enrollments;
+        this.registra = registra;
     }
 
     @GetMapping("/students/active-count")
@@ -84,6 +85,7 @@ public class RegistrarController {
 
     @GetMapping("/courses/top")
     public List<CourseEnrollmentCount> getTopCourses() {
-        return service.getTopCourses();
+        return registra.getTopCourses();
     }
+}
 
