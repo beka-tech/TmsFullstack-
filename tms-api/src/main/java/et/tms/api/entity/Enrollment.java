@@ -18,6 +18,10 @@ public class Enrollment {
     private BigDecimal grade; // null while still in progress
     @Column(name = "enrolled_at", nullable = false)
     private Instant enrolledAt = Instant.now();
+
+//    @Column(name = "archived", nullable = false)
+//    private boolean archived = false;
+
     protected Enrollment() {}
     public Enrollment(Student student, Course course, BigDecimal grade) {
         this.student = student;
