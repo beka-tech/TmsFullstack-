@@ -1,5 +1,6 @@
 package et.tms.api.test;
 import et.tms.api.entity.Student;
+import et.tms.api.report.EnrollmentReportService;
 import et.tms.api.repository.StudentRepository;
 import java.math.BigDecimal;
 import java.util.List;
@@ -7,14 +8,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/test")
 public class TestController {
     private static final Logger log = LoggerFactory.getLogger(TestController.class);
     private final StudentRepository students;
-    public TestController(StudentRepository students) {
+    private final EnrollmentReportService enrollmentReportService;
+    public TestController(StudentRepository students, EnrollmentReportService enrollmentReportService) {
         this.students = students;
+        this.enrollmentReportService = enrollmentReportService;
     }
     @GetMapping("/deferred")
     public List<String> deferred() {
@@ -41,4 +45,16 @@ public class TestController {
                 .map(Student::getName)
                 .toList();
     }
+
+    @GetMapping("/enrollments/n-plus-one")
+    public ResponseEntity<String> printNPlusOne() {
+
+        enrollmentReportService.printCountsShaped();
+        // this need DI from the Services
+
+        return ResponseEntity.ok(
+                "Enrollment report generated. Check Hibernate SQL logs."
+        );
+    }
+
 }
