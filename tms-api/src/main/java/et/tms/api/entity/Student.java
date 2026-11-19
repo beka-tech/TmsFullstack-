@@ -1,5 +1,6 @@
 package et.tms.api.entity;
 import jakarta.persistence.*;
+import org.hibernate.annotations.SQLRestriction;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -11,6 +12,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "students")
+@SQLRestriction("deleted = false") // org.hibernate.annotations: in every query
 @EntityListeners(AuditingEntityListener.class)
 public class Student {
     public Long getId() {
@@ -38,6 +40,12 @@ public class Student {
     @LastModifiedDate
     @Column(name = "last_updated")
     private Instant lastUpdated;
+
+    @Column(nullable = false)
+
+
+    private boolean deleted;
+
 
     @Version
     @Column(name = "version" , nullable = false)
@@ -99,7 +107,13 @@ public class Student {
         return version;
     }
 
+    public boolean isDeleted() {
+        return deleted;
+    }
 
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
 }
 
 

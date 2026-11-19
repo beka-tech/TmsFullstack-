@@ -3,17 +3,16 @@ import et.tms.api.entity.Student;
 import et.tms.api.report.CourseEnrollmentCount;
 import et.tms.api.report.StudentEnrollmentCount;
 import et.tms.api.report.StudentSummary;
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.repository.EntityGraph;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.*;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.repository.query.Param;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -56,6 +55,33 @@ public interface StudentRepository
     List<StudentEnrollmentCount> enrollmentCounts();
 
 
+    // Normal query: @SQLRestriction applies automatically
+    // findAll(Pageable pageable) is already inherited.
+
+    // Admin query: native SQL bypasses @SQLRestriction
+    @Query(
+            value = """
+            SELECT *
+            FROM students
+            WHERE deleted = true
+            ORDER BY id
+            """,
+            nativeQuery = true
+    )
+    List<Student> findDeletedForAdmin();
+
+    // Restore a deleted student
+    @Modifying
+    @Transactional
+    @Query(
+            value = """
+            UPDATE students
+            SET deleted = false
+            WHERE id = :id
+            """,
+            nativeQuery = true
+    )
+    int restore(@Param("id") long id);
 
 
 
