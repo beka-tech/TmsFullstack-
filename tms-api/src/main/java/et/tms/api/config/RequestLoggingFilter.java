@@ -1,3 +1,4 @@
+
 package et.tms.api.config;
 
 import jakarta.servlet.FilterChain;
@@ -17,28 +18,48 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Component
-@Order(Ordered.HIGHEST_PRECEDENCE) // outermost: wraps security too
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class RequestLoggingFilter extends OncePerRequestFilter {
-    private static final Logger log = LoggerFactory.getLogger(RequestLoggingFilter.class);
+
+    private static final Logger log =
+            LoggerFactory.getLogger(RequestLoggingFilter.class);
+
     private static final String HEADER = "X-Correlation-Id";
+
     @Override
-    protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res,
-                                    FilterChain chain) throws ServletException, IOException {
+    protected void doFilterInternal(
+            HttpServletRequest req,
+            HttpServletResponse res,
+            FilterChain chain
+    ) throws ServletException, IOException {
+
         String id = Optional.ofNullable(req.getHeader(HEADER))
-                .filter(h -> h.matches("[A-Za-z0-9-]{1,64}")) // reject log-injection junk
+                .filter(h -> h.matches("[A-Za-z0-9-]{1,64}"))
                 .orElseGet(() -> UUID.randomUUID().toString());
+
         long start = System.nanoTime();
-        MDC.put("correlationId", id); // included in every log line of this request
-        res.setHeader(HEADER, id); // BEFORE doFilter: response not committed yet
+
+        MDC.put("correlationId", id);
+
         try {
-            chain.doFilter(req, res); // the whole rest of the request happens in here
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            res.setHeader(HEADER, id);
+
+            chain.doFilter(req, res);
+
         } finally {
-            long ms = (System.nanoTime() - start) / 1_000_000;
-            log.info("{} {} -> {} in {} ms {}  ", req.getMethod(), req.getRequestURI(), res.getStatus(),req.getReader(), ms) ;
-            MDC.remove("correlationId"); // never leak into the next request on this thread
+            try {
+                long ms = (System.nanoTime() - start) / 1_000_000;
+
+                log.info("{} {} -> {} in {} ms",
+                        req.getMethod(),
+                        req.getRequestURI(),
+                        res.getStatus(),
+                        ms
+                );
+
+            } finally {
+                MDC.remove("correlationId");
+            }
         }
     }
 }
-

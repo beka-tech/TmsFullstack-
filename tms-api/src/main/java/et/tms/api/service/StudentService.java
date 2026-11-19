@@ -12,6 +12,8 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Objects;
+
 @Service
 public class StudentService {
 
@@ -55,28 +57,21 @@ public class StudentService {
     }
 
     @Transactional
-    public StudentDto update(
-            long id,
-            UpdateStudentRequest request
-    ) {
-        Student student = students.findById(id)
-                .orElseThrow(
-                        ()-> new StudentNotFoundException(id)
-                );
+    public StudentDto update(long id, UpdateStudentRequest request) {
 
-        // Detect a stale client request prevent accidentally overwrite
-        // Detect a stale client request
-        if (student.getVersion() != request.version()) {
+        Student student = students.findById(id)
+                .orElseThrow(() -> new StudentNotFoundException(id));
+
+        if (!Objects.equals(student.getVersion(), request.version())) {
             throw new ObjectOptimisticLockingFailureException(
                     Student.class,
                     id
             );
         }
-        // Apply business changes
+
         student.setName(request.name());
         student.setGpa(request.gpa());
 
-        // Force SQL execution before mapping response
         Student saved = students.saveAndFlush(student);
 
         return StudentDto.from(saved);
