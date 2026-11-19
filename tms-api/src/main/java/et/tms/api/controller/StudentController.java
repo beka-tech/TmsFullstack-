@@ -1,8 +1,11 @@
 package et.tms.api.controller;
 
+import et.tms.api.dto.StudentDto;
+import et.tms.api.dto.UpdateStudentRequest;
 import et.tms.api.report.StudentSummary;
 import et.tms.api.service.StudentService;
 
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -13,9 +16,11 @@ import org.springframework.web.server.ResponseStatusException;
 public class StudentController {
 
     private final StudentService service;
+    private final StudentService students;
 
-    public StudentController(StudentService service) {
+    public StudentController(StudentService service, StudentService students) {
         this.service = service;
+        this.students = students;
     }
 
     @GetMapping
@@ -30,5 +35,18 @@ public class StudentController {
         }
 
         return service.getStudents(page);
+    }
+
+    @GetMapping ("/{id}")
+    public StudentDto getStudent(@PathVariable long id){
+        return students.findById(id);
+    }
+
+    @PutMapping("/{id}")
+        public StudentDto updateStudent(
+                @PathVariable  long id,
+                @Valid @RequestBody UpdateStudentRequest request
+        ) {
+        return students.update(id, request);
     }
 }

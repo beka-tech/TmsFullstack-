@@ -1,10 +1,14 @@
 package et.tms.api.service;
 
+import et.tms.api.dto.StudentDto;
+import et.tms.api.dto.UpdateStudentRequest;
+import et.tms.api.exception.StudentNotFoundException;
 import et.tms.api.report.StudentSummary;
 import et.tms.api.entity.Student;
 import et.tms.api.repository.StudentRepository;
 
 import org.springframework.data.domain.*;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,4 +43,43 @@ public class StudentService {
                 )
         );
     }
+
+    @Transactional(readOnly = true)
+    public StudentDto findById(long id){
+
+        Student student  = students.findById(id)
+                .orElseThrow(
+                () -> new StudentNotFoundException(id)
+        );
+        return StudentDto.from(student);
+    }
+
+    @Transactional
+    public StudentDto update(
+            long id,
+            UpdateStudentRequest request
+    ) {
+        Student student = students.findById(id)
+                .orElseThrow(
+                        ()-> new StudentNotFoundException(id)
+                );
+
+        // Detect a stale client request prevent accidentally overwrite
+        // Detect a stale client request
+        if (student.getVersion() != request.version()) {
+            throw new ObjectOptimisticLockingFailureException(
+                    Student.class,
+                    id
+            );
+        }
+        // Apply business changes
+        student.setName(request.name());
+        student.setGpa(request.gpa());
+
+        // Force SQL execution before mapping response
+        Student saved = students.saveAndFlush(student);
+
+        return StudentDto.from(saved);
+    }
+
 }
