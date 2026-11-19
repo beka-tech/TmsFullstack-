@@ -1,11 +1,17 @@
 package et.tms.api.entity;
 import jakarta.persistence.*;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+
+
 @Entity
 @Table(name = "students")
+@EntityListeners(AuditingEntityListener.class)
 public class Student {
     public Long getId() {
         return id;
@@ -29,6 +35,7 @@ public class Student {
     @OneToMany(mappedBy = "student") // the other side owns the foreign key
     private List<Enrollment> enrollments = new ArrayList<>();
 
+    @LastModifiedDate
     @Column(name = "last_updated")
     private Instant lastUpdated;
 
@@ -88,17 +95,11 @@ public class Student {
         return lastUpdated;
     }
 
-    public void setLastUpdated(Instant lastUpdated) {
-        this.lastUpdated = lastUpdated;
-    }
-
     public long getVersion() {
         return version;
     }
 
-    public void setVersion(long version) {
-        this.version = version;
-    }
+
 }
 
 
