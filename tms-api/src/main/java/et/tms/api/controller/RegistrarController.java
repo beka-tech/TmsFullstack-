@@ -27,15 +27,15 @@ public class RegistrarController {
     private final StudentRepository students;
     private final CourseRepository courses;
     private final EnrollmentRepository enrollments;
-    private final RegistrarService registra;
+    private final RegistrarService registrar;
 
     public RegistrarController(StudentRepository students,
                                CourseRepository courses,
-                               EnrollmentRepository enrollments, RegistrarService registra) {
+                               EnrollmentRepository enrollments, RegistrarService registrar) {
         this.students = students;
         this.courses = courses;
         this.enrollments = enrollments;
-        this.registra = registra;
+        this.registrar = registrar;
     }
 
     @GetMapping("/students/active-count")
@@ -85,7 +85,7 @@ public class RegistrarController {
 
     @GetMapping("/courses/top")
     public List<CourseEnrollmentCount> getTopCourses() {
-        return registra.getTopCourses();
+        return registrar.getTopCourses();
     }
 }
 

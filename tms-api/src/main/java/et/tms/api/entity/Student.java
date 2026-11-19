@@ -1,6 +1,7 @@
 package et.tms.api.entity;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 @Entity
@@ -27,6 +28,14 @@ public class Student {
     private boolean active = true;
     @OneToMany(mappedBy = "student") // the other side owns the foreign key
     private List<Enrollment> enrollments = new ArrayList<>();
+
+    @Column(name = "last_updated")
+    private Instant lastUpdated;
+
+    @Version
+    @Column(name = "version" , nullable = false)
+    private long version;
+
     protected Student() {} // required by JPA
     public Student(String registrationNumber, String name, BigDecimal gpa) {
         this.registrationNumber = registrationNumber;
@@ -74,4 +83,29 @@ public class Student {
         this.registrationNumber = registrationNumber;
     }
     // getters and setters ...
+
+    public Instant getLastUpdated() {
+        return lastUpdated;
+    }
+
+    public void setLastUpdated(Instant lastUpdated) {
+        this.lastUpdated = lastUpdated;
+    }
+
+    public long getVersion() {
+        return version;
+    }
+
+    public void setVersion(long version) {
+        this.version = version;
+    }
 }
+
+
+/* audit stamp
+Hibernate automatically maintains last_updated when a student changes.
+Hibernate increments version on a successful update.
+Two staff members cannot silently overwrite each other's changes.
+An outdated update receives HTTP 409 Conflict.
+API clients receive the version but not the internal audit timestamp.
+* */
