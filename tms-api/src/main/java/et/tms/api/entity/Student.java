@@ -42,6 +42,8 @@ public class Student {
     private Instant lastUpdated;
 
     @Column(nullable = false)
+
+
     private boolean deleted;
 
 
@@ -105,7 +107,13 @@ public class Student {
         return version;
     }
 
+    public boolean isDeleted() {
+        return deleted;
+    }
 
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
 }
 
 

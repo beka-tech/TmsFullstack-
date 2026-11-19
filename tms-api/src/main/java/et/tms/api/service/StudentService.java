@@ -77,4 +77,14 @@ public class StudentService {
         return StudentDto.from(saved);
     }
 
+    @Transactional
+    public void softdelete (long id){
+
+        Student student = students.findById(id)
+                .orElseThrow(
+                        () -> new StudentNotFoundException(id)
+                );
+        student.setDeleted(true);
+    }
+
 }

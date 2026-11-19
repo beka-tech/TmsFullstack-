@@ -14,3 +14,4 @@ public class TmsApiApplication {
 	}
 
 }
+//.\mvnw.cmd clean spring-boot:run
