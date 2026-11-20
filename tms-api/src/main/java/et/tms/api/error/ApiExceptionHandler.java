@@ -1,5 +1,6 @@
 package et.tms.api.error;
 
+import et.tms.api.exception.StudentNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -55,6 +56,17 @@ public class ApiExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.CONFLICT)
                 .body(problem);
+    }
+
+
+    @ExceptionHandler(StudentNotFoundException.class)
+    public ProblemDetail handleNotFound(
+            StudentNotFoundException ex
+    ) {
+        return ProblemDetail.forStatusAndDetail(
+                HttpStatus.NOT_FOUND,
+                ex.getMessage()
+        );
     }
 
 

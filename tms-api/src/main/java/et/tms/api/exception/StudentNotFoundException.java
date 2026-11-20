@@ -11,15 +11,7 @@ public class StudentNotFoundException
     public StudentNotFoundException(long id) {
         super("Student not found with id: " + id);
     }
-    @ExceptionHandler(StudentNotFoundException.class)
-    public ProblemDetail handleNotFound(
-            StudentNotFoundException ex
-    ) {
-        return ProblemDetail.forStatusAndDetail(
-                HttpStatus.NOT_FOUND,
-                ex.getMessage()
-        );
-    }
+
 
 //    @ExceptionHandler(OptimisticLockingFailureException.class)
 //    public ProblemDetail handleOptimisticLock(

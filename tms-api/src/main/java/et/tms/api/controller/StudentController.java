@@ -42,11 +42,6 @@ public class StudentController {
         return students.findById(id);
     }
 
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable long id){
-        students.softdelete(id);
-    }
-
     @PutMapping("/{id}")
         public StudentDto updateStudent(
                 @PathVariable  long id,
@@ -54,4 +49,10 @@ public class StudentController {
         ) {
         return students.update(id, request);
     }
+
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable long id){
+        students.softdelete(id);
+    }
+
 }

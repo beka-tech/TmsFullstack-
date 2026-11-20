@@ -1,17 +1,12 @@
 package et.tms.api.repository;
 import et.tms.api.entity.Student;
-import et.tms.api.report.CourseEnrollmentCount;
 import et.tms.api.report.StudentEnrollmentCount;
 import et.tms.api.report.StudentSummary;
 import jakarta.transaction.Transactional;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.*;
 
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.data.repository.query.Param;
 
 import java.math.BigDecimal;

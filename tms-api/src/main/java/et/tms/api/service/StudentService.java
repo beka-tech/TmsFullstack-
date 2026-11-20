@@ -12,6 +12,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -85,6 +86,16 @@ public class StudentService {
                         () -> new StudentNotFoundException(id)
                 );
         student.setDeleted(true);
+    }
+
+
+
+    @Transactional(readOnly = true)
+    public List<StudentDto> getDeletedStudents() {
+        return students.findDeletedForAdmin()
+                .stream()
+                .map(StudentDto::from)
+                .toList();
     }
 
 }
