@@ -12,15 +12,15 @@ public class Course {
     private String code; // natural key: "CS-101"
     @Column(nullable = false, length = 200)
     private String title;
-    @Column(nullable = false)
-    private int capacity;
+    @Column(name = "max_capacity",nullable = false)
+    private int maxCapacity;
     @OneToMany(mappedBy = "course")
     private List<Enrollment> enrollments = new ArrayList<>();
     protected Course() {}
     public Course(String code, String title, int capacity) {
         this.code = code;
         this.title = title;
-        this.capacity = capacity;
+        this.maxCapacity = capacity;
     }
 
     public String getCode() {
@@ -39,12 +39,12 @@ public class Course {
         this.title = title;
     }
 
-    public int getCapacity() {
-        return capacity;
+    public int getmaxCapacity() {
+        return maxCapacity;
     }
 
-    public void setCapacity(int capacity) {
-        this.capacity = capacity;
+    public void setmaxCapacity(int maxCapacity) {
+        this.maxCapacity = maxCapacity;
     }
 
     public List<Enrollment> getEnrollments() {
