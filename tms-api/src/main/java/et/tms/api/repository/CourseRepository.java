@@ -24,4 +24,5 @@ public interface CourseRepository
         """)
     List<CourseEnrollmentCount> coursesByEnrollmentCount(
             );
+
 }

@@ -16,11 +16,15 @@ public class Course {
     private int maxCapacity;
     @OneToMany(mappedBy = "course")
     private List<Enrollment> enrollments = new ArrayList<>();
-    protected Course() {}
+    public Course() {}
     public Course(String code, String title, int capacity) {
         this.code = code;
         this.title = title;
         this.maxCapacity = capacity;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public String getCode() {
