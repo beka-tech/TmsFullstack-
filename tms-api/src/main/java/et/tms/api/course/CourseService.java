@@ -18,34 +18,25 @@ public class CourseService {
     public CourseService(CourseRepository courses) {
         this.courses = courses;
     }
+
+
     @Transactional(readOnly = true)
-    public Course get(long id) {
-        // TODO 1: return courses.findById(id), or throw
-        // ApiProblem.notFound("Course not found",
-        // "No course with id <id>.")
-        // (you create ApiProblem in Step 2).
-//        throw new UnsupportedOperationException("TODO 1");
-        return courses.findById( id).orElseThrow(() -> ApiProblem.notFound(
+    public CourseResponse get(long id) {
+        return courses.findResponseById( id).orElseThrow(() -> ApiProblem.notFound(
                 "Course Not Found",
                 "Course with Id " +id + "does not exit"
         ));
     }
+
+
     @Transactional
-    public Course create(CreateCourseRequest request) {
-        Course course = new Course(
-                request.code(),
-                request.title(),
-                request.maxCapacity()
-        );
-
-        Course saved = courses.save(course);
-
-
-
-        log.info("Created course id={} code={}",
-                saved.getId(), request.code());
-
-        return saved;
+    public CourseResponse create(CreateCourseRequest request) {
+        Course saved = courses.saveAndFlush(new Course(
+                request.code(), request.title(), request.maxCapacity()));
+        log.info("Created course {} ({})", saved.getId(), saved.getCode());
+        return get(saved.getId());
     }
+
+
 
 }
