@@ -3,13 +3,19 @@ package et.tms.api.error;
 import et.tms.api.exception.StudentNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ProblemDetail;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 @RestControllerAdvice
 
@@ -68,6 +74,28 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
                 HttpStatus.NOT_FOUND,
                 ex.getMessage()
         );
+    }
+
+
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(
+            MethodArgumentNotValidException ex, HttpHeaders headers,
+            HttpStatusCode status, WebRequest request) {
+        // Spring has already prepared a 400 ("Invalid request content.")
+        ProblemDetail problem = ex.getBody();
+        problem.setTitle("Validation failed");
+        problem.setDetail("One or more fields are invalid.");
+        problem.setProperty("errors", fieldErrors(ex));
+        return handleExceptionInternal(ex, problem, headers, status, request);
+    }
+    private static Map<String, List<String>> fieldErrors(
+            MethodArgumentNotValidException ex) {
+        Map<String, List<String>> errors = new TreeMap<>();
+        for (FieldError error : ex.getBindingResult().getFieldErrors()) {
+            errors.computeIfAbsent(error.getField(), field -> new ArrayList<>())
+                    .add(error.getDefaultMessage());
+        }
+        return errors;
     }
 
 

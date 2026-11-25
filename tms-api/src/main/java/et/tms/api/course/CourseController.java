@@ -1,6 +1,8 @@
 package et.tms.api.course;
 import et.tms.api.entity.Course;
 import java.net.URI;
+
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -12,22 +14,18 @@ public class CourseController {
         this.courses = courses;
     }
     @GetMapping("/{id}")
-    public Course get(@PathVariable Long id) {
+    public CourseResponse get(@PathVariable Long id) {
         return courses.get(id);
     }
 
+
+
     @PostMapping
-    public ResponseEntity<Course> create(
-            @RequestBody CreateCourseRequest request) {
-
-        Course created = courses.create(request);
-
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(created.getId())
-                .toUri();
-
+    public ResponseEntity<CourseResponse> create(
+            @Valid @RequestBody CreateCourseRequest request) {
+        CourseResponse created = courses.create(request);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}").buildAndExpand(created.id()).toUri();
         return ResponseEntity.created(location).body(created);
     }
 }
