@@ -29,6 +29,7 @@ public interface CourseRepository
             );
 
 
+//    boolean existsByCourseId(long courseId);
     boolean existsByCode(String code); // used in Exercise 3
 
     @Query("""
