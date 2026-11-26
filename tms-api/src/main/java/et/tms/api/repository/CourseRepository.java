@@ -28,20 +28,15 @@ public interface CourseRepository
     List<CourseEnrollmentCount> coursesByEnrollmentCount(
             );
 
-//    @Query("""
-//        SELECT new et.tms.api.course.CourseResponse(
-//            c.id, c.code, c.title, c.maxCapacity, cout(e)
-//        FROM Course c left join c.enrollments e
-//        WHERE c.id = :id
-//        GROUP BY  c.id, c.code, c.title, c.maxCapacity
-//""")
+
+    boolean existsByCode(String code); // used in Exercise 3
 
     @Query("""
- select new et.tms.api.course.CourseResponse(
- c.id, c.code, c.title, c.maxCapacity, count(e))
- from Course c left join c.enrollments e
- where c.id = :id
- group by c.id, c.code, c.title, c.maxCapacity""")
+        select new et.tms.api.course.CourseResponse(
+            c.id, c.code, c.title, c.maxCapacity, count(e))
+        from Course c left join c.enrollments e
+        where c.id = :id
+        group by c.id, c.code, c.title, c.maxCapacity""")
     Optional<CourseResponse> findResponseById(@Param("id") Long id);
 
 }
