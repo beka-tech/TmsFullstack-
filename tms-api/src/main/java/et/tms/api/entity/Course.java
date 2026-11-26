@@ -13,7 +13,7 @@ public class Course {
     @Column(nullable = false, length = 200)
     private String title;
     @Column(name = "max_capacity",nullable = false)
-    private int maxCapacity;
+    private Integer maxCapacity;
     @OneToMany(mappedBy = "course")
     private List<Enrollment> enrollments = new ArrayList<>();
     public Course() {}
@@ -43,9 +43,9 @@ public class Course {
         this.title = title;
     }
 
-    public int getmaxCapacity() {
-        return maxCapacity;
-    }
+//    public int getmaxCapacity() {
+//        return maxCapacity;
+//    }
 
     public void setmaxCapacity(int maxCapacity) {
         this.maxCapacity = maxCapacity;
@@ -57,6 +57,14 @@ public class Course {
 
     public void setEnrollments(List<Enrollment> enrollments) {
         this.enrollments = enrollments;
+    }
+
+    public long getMaxCapacity() {
+        return maxCapacity;
+    }
+
+    public void setMaxCapacity(Integer maxCapacity) {
+        this.maxCapacity = maxCapacity;
     }
     // getters and setters ...
 }

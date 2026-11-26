@@ -60,5 +60,12 @@ public class Enrollment {
     public void setEnrolledAt(Instant enrolledAt) {
         this.enrolledAt = enrolledAt;
     }
+
+    public Long getId() {
+        return id;
+    }
+
+    //    public Long getId() {
+//    }
     // getters and setters ...
 }
