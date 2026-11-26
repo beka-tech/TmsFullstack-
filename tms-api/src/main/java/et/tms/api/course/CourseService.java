@@ -31,6 +31,12 @@ public class CourseService {
 
     @Transactional
     public CourseResponse create(CreateCourseRequest request) {
+
+        if(courses.existsByCode(request.code())){
+            throw ApiProblem.conflict("Courses code Already Exists",
+                                         "A Courses With '%s' is already registered ".formatted(request.code()) );
+        }
+
         Course saved = courses.saveAndFlush(new Course(
                 request.code(), request.title(), request.maxCapacity()));
         log.info("Created course {} ({})", saved.getId(), saved.getCode());
