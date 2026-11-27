@@ -1,4 +1,6 @@
 package et.tms.api.course;
+import et.tms.api.common.PagedRequest;
+import et.tms.api.common.PagedResponse;
 import et.tms.api.entity.Course;
 import java.net.URI;
 
@@ -13,6 +15,13 @@ public class CourseController {
     public CourseController(CourseService courses) {
         this.courses = courses;
     }
+
+    @GetMapping
+    public PagedResponse<CourseResponse> list(PagedRequest request) {
+        return courses.search(request);
+    }
+
+
     @GetMapping("/{id}")
     public CourseResponse get(@PathVariable Long id) {
         return courses.get(id);
