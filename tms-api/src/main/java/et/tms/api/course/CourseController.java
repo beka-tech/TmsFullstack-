@@ -37,4 +37,17 @@ public class CourseController {
                 .path("/{id}").buildAndExpand(created.id()).toUri();
         return ResponseEntity.created(location).body(created);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> update(@PathVariable Long id,
+                                       @Valid @RequestBody UpdateCourseRequest request){
+        courses.update(id, request);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable  Long id) {
+        courses.delete(id);
+        return ResponseEntity.noContent().build();
+    }
 }

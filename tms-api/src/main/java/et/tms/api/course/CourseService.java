@@ -5,6 +5,7 @@ import et.tms.api.common.PagedResponse;
 import et.tms.api.entity.Course;
 import et.tms.api.error.ApiProblem;
 import et.tms.api.repository.CourseRepository;
+import et.tms.api.repository.EnrollmentRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -17,6 +18,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Locale;
 import java.util.Map;
 
+import static et.tms.api.error.ApiProblem.notFound;
+
+
 @Service
 
 public class CourseService {
@@ -24,20 +28,22 @@ public class CourseService {
     private static final Logger log =
             LoggerFactory.getLogger(CourseService.class);
     private final CourseRepository courses;
+    private final EnrollmentRepository enrollments;
 
     // Whitelist: client text never reaches the query as a property name.
     private static final Map<String, String> SORTABLE = Map.of(
             "title", "title", "code", "code",
             "maxcapacity", "maxCapacity");
 
-    public CourseService(CourseRepository courses) {
+    public CourseService(CourseRepository courses, EnrollmentRepository enrollments) {
         this.courses = courses;
+        this.enrollments = enrollments;
     }
 
 
     @Transactional(readOnly = true)
     public CourseResponse get(long id) {
-        return courses.findResponseById( id).orElseThrow(() -> ApiProblem.notFound(
+        return courses.findResponseById( id).orElseThrow(() -> notFound(
                 "Course Not Found",
                 "Course with Id " +id + "does not exit"
         ));
@@ -112,6 +118,32 @@ public class CourseService {
                 request.page(),
                 request.pageSize()
         );
+    }
+    @Transactional
+    public void update(long id, UpdateCourseRequest request) {
+        Course course = courses.findById(id)
+                .orElseThrow(() -> notFound("Course not Found ", "Course with Id" + id +"Dose not exit "));
+        long enrolled = enrollments.countByCourseId(id);
+        if (request.maxCapacity() < enrolled) {
+            throw ApiProblem.conflict("Capacity below current enrollment",
+                    ("Course '%s' already has %d students, so "
+                            + "maxCapacity cannot be %d.")
+                            .formatted(course.getCode(), enrolled,
+                                    request.maxCapacity()));
+        }
+        course.setTitle(request.title()); // dirty checking writes it
+        course.setMaxCapacity(request.maxCapacity());
+    }
+
+
+    @Transactional
+    public void delete (long id){
+        Course course = courses.findById(id)
+                .orElseThrow(() ->notFound(
+                        "Course not found",
+                        "Course with this Id " +id+ "Dose not Exitst "
+                ));
+        courses.delete(course);
     }
 
 
