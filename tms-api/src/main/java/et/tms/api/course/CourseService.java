@@ -60,28 +60,35 @@ public class CourseService {
 
     @Transactional(readOnly = true)
     public PagedResponse<CourseResponse> search(PagedRequest request) {
-        // TODO 1: Pick the sort property. Look request.orderBy() up,
-        // lower-cased, in SORTABLE; an unknown value falls back to "title".
-        // Never pass the raw string on.
-        // Stuck?
-        // String property = SORTABLE.getOrDefault(
-        // request.orderBy().toLowerCase(Locale.ROOT), "title");
-        String property = SORTABLE.getOrDefault(request.orderBy().toLowerCase(Locale.ROOT), "title");
 
-        // TODO 2: Build the Sort: the property in the requested direction,
-        // then Sort.Order.asc("id") as a tie-breaker.
-        // Stuck?
-        // Sort.Direction direction = request.descending()
-        // ? Sort.Direction.DESC : Sort.Direction.ASC;
-        // Sort sort = Sort.by(new Sort.Order(direction, property),
-        // Sort.Order.asc("id"));
-        Sort.Direction direction = request.descending() ? Sort.Direction.DESC : Sort.Direction.ASC;
-        Sort sort = Sort.by(new Sort.Order(direction, property),Sort.Order.asc("id"));
+        // 1. Normalize sorting input
+        // Convert client input to a consistent format for lookup.
+        // Example: "TITLE" -> "title"
+        String key = request.orderBy() == null
+                ? ""
+                : request.orderBy().toLowerCase(Locale.ROOT);
 
-        // TODO 3: Build the Pageable. Spring pages are ZERO-based; the API's
-        // pages are one-based, so subtract one.
-        // PageRequest.of(request.page() - 1, request.pageSize(), sort)
+        // 2. Whitelist sortable properties
+        // Allow only approved properties; otherwise default to "title".
+        // Never trust raw sorting input from the client.
+        String property = SORTABLE.getOrDefault(key, "title");
 
+        // 3. Construct deterministic sorting
+        // Choose ASC or DESC based on the client's request.
+        // Use ID as a tie-breaker to ensure consistent ordering
+        // when multiple records have the same property value.
+        Sort.Direction direction = request.descending()
+                ? Sort.Direction.DESC
+                : Sort.Direction.ASC;
+
+        Sort sort = Sort.by(
+                new Sort.Order(direction, property),
+                Sort.Order.asc("id")
+        );
+
+        // 4. Construct Pageable
+        // Convert API's one-based page to Spring's zero-based page.
+        // Combine page number, page size, and sorting instructions.
         int zeroBasedPage = Math.max(0, request.page() - 1);
 
         Pageable pageable = PageRequest.of(
@@ -90,18 +97,21 @@ public class CourseService {
                 sort
         );
 
-        // TODO 4: Call courses.search(request.search(), pageable).
+        // 5. Execute repository query
+        // Let the database search, sort, paginate, and count
+        // matching records instead of processing them in Java.
+        Page<CourseResponse> page =
+                courses.search(request.search(), pageable);
 
-        Page<CourseResponse> page = courses.search(request.search(),pageable);
-
-        // TODO 5: Return PagedResponse.of(...) with the page content, the
-        // TOTAL from the Page object (getTotalElements), and the page and
-        // pageSize from the request.
+        // 6. Construct response
+        // Return the current page's records, total matching records,
+        // and pagination metadata to the client.
         return PagedResponse.of(
                 page.getContent(),
                 page.getTotalElements(),
                 request.page(),
-                request.pageSize());
+                request.pageSize()
+        );
     }
 
 
